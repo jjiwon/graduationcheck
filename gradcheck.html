@@ -1,15 +1,54 @@
+<!DOCTYPE html>
 
+<html>
+<head>
+</head>
 
+<body>
+	<h3> 2015학번 기준으로 작성 (임시) </h3>
+	<div>
+		<form id="aaa">
+			<input type="button" value="과목 추가" onclick="addSubject()"> <br><br>
+			<div id="subject0">
+				<select id="level1">
+					<option selected value="base">선택하세요.</option>
+					<option value="majCore">전공핵심</option>
+					<option value="majGen">전공일반</option>
+					<option value="liberal">교양</option>
+					<option value="pedagogy">교직</option>
+				</select>
+				<select id="level2">
+					<option>왼쪽부터 선택.</option>
+				</select>
+				<input id="name1" type="text" size="15" disabled>
+				<select id="crd1">
+					<option selected value="base">...</option>
+					<option value="c1">1</option>
+					<option value="c2">2</option>
+					<option value="c3">3</option>
+				</select>
+				<select id="grd1">
+					<option selected value="base">...</option>
+					<option value="A+">A+</option>
+					<option value="A">A</option>
+					<option value="B+">B+</option>
+					<option value="B">B</option>
+					<option value="C+">C+</option>
+					<option value="C">C</option>
+					<option value="D+">D+</option>
+					<option value="D">D</option>
+					<option value="F">F</option>
+					<option value="P">P</option>
+					<option value="W">W</option>
+				</select>
+				<input type="button" value="삭제" onclick="delSubject()">
+			</div>
+		</form>
+	
+	</div>
 
-
-
-
-
-
-
-<script>
-
-
-
-
-</script>
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="gradscript.js">
+	</script>
+</body>
+</html>
