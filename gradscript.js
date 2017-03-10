@@ -1,3 +1,4 @@
+/* 드롭다운 리스트 내부의 항목 (교과목) */
 var not_selected = "not_selected";
 var direct_input = "직접입력";
 var subject_section = {
@@ -6,8 +7,10 @@ var subject_section = {
 	"교양":not_selected+",인성,리더십,기본영어,전문영어/글로벌문화,의사소통,창의와사유,기초인문사회과학,기초자연과학,인간/문화,사회/역사,자연/과학/기술,기타교양",
 	"교직":not_selected+",특수교육학개론,학교폭력예방및학생의이해,교직실무,교육봉사활동,교육실습,"+direct_input
 };
-var LV1_event_listener = "#0_LV1_0,#0_LV1_1";
-var LV2_event_listener = "#0_LV2_0,#0_LV2_1";
+
+/* jQuery event listener */
+var LV1_event_listener = "";
+var LV2_event_listener = "";
 var LV1_function = function() {
 	//console.log(111111112313);
 	var what_subject = $(this)[0].id;
@@ -64,10 +67,10 @@ var LV2_function = function() {
 	}
 };
 
+//$(LV1_event_listener).change(LV1_function);
+//$(LV2_event_listener).change(LV2_function);
 
-$(LV1_event_listener).change(LV1_function);
-$(LV2_event_listener).change(LV2_function);
-
+/* 과목 추가 및 삭제, 학기 별 학점 계산 파트 */
 var semesterN = 1;
 var subjectN = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // 기본 8개 학기 + 기타 학기(초과학기 및 계절학기)
 var subjectList = [[null],[null],[null],[null],[null],[null],[null],[null],[null]];
@@ -84,7 +87,9 @@ function checkRedundancy(semester){
 }
 
 function addSubject(semester){ // 절대 건드리지 마세요
-	subjectList[semester].push(document.createElement('div'));
+	checkRedundancy(semester);
+	if(subjectList[semester][0] == null) subjectList[semester][0] = document.createElement('div');
+	else subjectList[semester].push(document.createElement('div'));
 	document.getElementById("SM"+String(semester)).appendChild(subjectList[semester][subjectList[semester].length-1]);
 	subjectList[semester][subjectList[semester].length-1].id=String(semester) + "_" + String(subjectN[semester]);
 	subjectList[semester][subjectList[semester].length-1].innerHTML = '<select id="' + String(semester) + '_LV1_' + String(subjectN[semester]) + '"><option selected value="base">선택하세요.</option><option value="majCore">전공핵심</option><option value="majGen">전공일반</option><option value="liberal">교양</option><option value="pedagogy">교직</option></select>' +
@@ -94,70 +99,67 @@ function addSubject(semester){ // 절대 건드리지 마세요
 '&nbsp;<select id="' + String(semester) + '_GRD_' + String(subjectN[semester]) + '"><option selected value="base">...</option><option value="A+">A+</option><option value="A">A</option><option value="B+">B+</option><option value="B">B</option><option value="C+">C+</option><option value="C">C</option><option value="D+">D+</option><option value="D">D</option><option value="F">F</option><option value="P">P</option><option value="W">W</option></select>' +
 '&nbsp;<input type="button" value="삭제" onclick="delSubject(' + "'SM" + String(semester) + "_" + String(subjectN[semester]) + "'" + ')">';
 	
-	LV1_event_listener += ",#" + String(semester) + "_LV1_" + String(subjectN[semester]);
-	LV2_event_listener += ",#" + String(semester) + "_LV2_" + String(subjectN[semester]);
+	if(LV1_event_listener == ""){
+		LV1_event_listener += "#" + String(semester) + "_LV1_" + String(subjectN[semester]);
+		LV2_event_listener += "#" + String(semester) + "_LV2_" + String(subjectN[semester]);
+	}
+	else {
+		LV1_event_listener += ",#" + String(semester) + "_LV1_" + String(subjectN[semester]);
+		LV2_event_listener += ",#" + String(semester) + "_LV2_" + String(subjectN[semester]);
+	}
 	subjectN[semester]++;
 	totalN[semester]++;
 
 	$(LV1_event_listener).change(LV1_function);
 	$(LV2_event_listener).change(LV2_function);
 }
-addSubject(0);
+addSubject(0); // node 생성이 아닌 html로 만든 div 항목은 삭제가 안됨
 
 function delSubject(semesterDat){
-	//console.log(semesterDat);
-	document.getElementById("SM"+semesterDat[2]).removeChild(subjectList[Number(semesterDat[2])][Number(semesterDat.substr(4))+1]);
-	subjectList[Number(semesterDat[2])][Number(semesterDat.substr(4))+1] = null;
+	document.getElementById("SM"+semesterDat[2]).removeChild(subjectList[Number(semesterDat[2])][Number(semesterDat.substr(4))]);
+	subjectList[Number(semesterDat[2])][Number(semesterDat.substr(4))] = null;
 	totalN[Number(semesterDat[2])]--;
 }
-/*
+
 function calcGPA(semester){
 	var a = 0;
 	var b = 0;
+	checkRedundancy(semester);
 	for(var i=0;i<subjectN[semester];i++){
-		if(subjectList[0]){
+		var grade;
+		if(subjectList[semester][i] != null && 
+			document.getElementById(String(semester) + "_GRD_" + String(i)).value != "base" && 
+			document.getElementById(String(semester) + "_CRD_" + String(i)).value != "base"){
 			switch(document.getElementById(String(semester) + "_GRD_" + String(i)).value){
-				case 'A+':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 4.5;
-				break;
-				case 'A':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 4;
-				break;
-				case 'B+':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 3.5;
-				break;
-				case 'B':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 3;
-				break;
-				case 'C+':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 2.5;
-				break;
-				case 'C':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 2;
-				break;
-				case 'D+':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 1.5;
-				break;
-				case 'D':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 1;
-				break;
-				case 'F':
-					a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * 0;
-				break;
+				case 'A+':grade=4.5;break;
+				case 'A':grade=4;break;
+				case 'B+':grade=3.5;break;
+				case 'B':grade=3;break;
+				case 'C+':grade=2.5;break;
+				case 'C':grade=2;break;
+				case 'D+':grade=1.5;break;
+				case 'D':grade=1;break;
+				case 'F':grade=0;break;
+				default:grade=0;break;
 			}
+			a += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1)) * grade;
 			b += Number(document.getElementById(String(semester) + "_CRD_" + String(i)).value.slice(1));
 		}
 	}
-	//console.log(a);
-	//console.log(b);
-
+	console.log(a, b);
 	if(!isGraded) {
 		yourGPA = document.createElement('div');
 		document.getElementById("SM"+String(semester)).appendChild(yourGPA);
 		isGraded = true;
 	}
 
-	yourGPA.innerHTML = '너의 학점은. ' + String((a/b/*+0.005*/  /*).toFixed(2)); // toFixed 함수가 반올림? 버림?d
+	yourGPA.innerHTML = '너의 학점은. ' + String((a/b/*+0.005*/  ).toFixed(2)); // toFixed 함수가 반올림? 버림?d
 }
 
-setInterval(function(){for(var i=0;i<semesterN;i++)calcGPA(i)},100);*/
+/* 추가할 내용 */
+$("#SM0").hide();
+$("#INIT").click(function(){
+	$("#SM0").show();
+	$("#INIT").hide();
+	setInterval(function(){for(var i=0;i<semesterN;i++){calcGPA(i);}},500);
+});
