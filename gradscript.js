@@ -163,3 +163,5 @@ $("#INIT").click(function(){
 	$("#INIT").hide();
 	setInterval(function(){for(var i=0;i<semesterN;i++){calcGPA(i);}},500);
 });
+
+/*과제_주석 추가_조한빛*/
