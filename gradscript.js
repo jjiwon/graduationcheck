@@ -8,6 +8,8 @@ var subject_section = {
 	"교직":not_selected+",특수교육학개론,학교폭력예방및학생의이해,교직실무,교육봉사활동,교육실습,"+direct_input
 };
 
+/* 주석달기 */
+
 /* jQuery event listener */
 var LV1_event_listener = "";
 var LV2_event_listener = "";
